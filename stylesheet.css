@@ -31,7 +31,7 @@ g.close {
    /* fill: #00b35c;
     */
     fill-opacity:0;
-    stroke-width: 1.5px
+    stroke-width: 1.4px
 }
 g {
     font-family: 'rubik-bold', sans-serif;
@@ -43,19 +43,22 @@ g.x.grid {
 g.x.axis {
     font-color: rgb(90,90,90);
     font-weight: bold;
+    stroke-width:1.86px;
     font-size:14px;
     font-family: 'Staatliches', cursive;
-    text-transform: uppercase;
-    stroke-width:0px;
+    text-transfo2b1Ce9rm: uppercase;
     color: blue;
+}
+path.domain{
+  stroke: rgb(170,170,170);
 }
 g.y.grid {
     opacity: .1;
     stroke-width: 1.5px;
     font-family: inherit;
 }
-g.x.axis.line{
-    stroke: #2b1Ce9;
+g.x.axis.path{
+    stroke: rgb(90,90,90);
 }
 tick.text{
     color:blue;

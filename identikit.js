@@ -27,7 +27,9 @@
         				close: +d.indicators.close,
         				volume: +d.indicators.volume
         			};
-        	   })
+            })
+
+            data = data.slice(data.length - 200, data.length)
 
           // defaultidentikit margins
           var margin = {top: 20, right: 20, bottom: 30, left: 50},
