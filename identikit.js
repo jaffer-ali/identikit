@@ -3,6 +3,7 @@
     function init(){
       var identikit = {};
       identikit.tickF = function(d, i) {
+        console.log(d,i);
         		if (d.getMonth() == 0) {
         			return d.getFullYear();
         		} else {
@@ -32,7 +33,7 @@
             data = data.slice(data.length - 200, data.length)
 
           // defaultidentikit margins
-          var margin = {top: 20, right: 20, bottom: 30, left: 50},
+          var margin = {top: 20, right: 0, bottom: 15, left: 0},
             width = sizes.width - margin.left - margin.right,
             height = sizes.height - margin.top - margin.bottom;
 
