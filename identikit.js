@@ -1,15 +1,57 @@
-(function(window){
+(function(window){ // efficiency creeps
     'use strict'
     function init(){
       var identikit = {};
-      identikit.tickF = function(d, i) {
-        console.log(d,i);
+      identikit.monthTickF = function(d, i) {
+        const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
         		if (d.getMonth() == 0) {
         			return d.getFullYear();
         		} else {
         			return months[d.getMonth()];
         		}
         }
+      identikit.dayTickF = function(d, i) {
+        	if (d.getMonth() == 0) {
+          	return d.getFullYear();
+          } else {
+          	return months[d.getMonth()];
+          }
+      }
+      identikit.completeXDate = function(range, date) {
+        let endDate = new Date()
+        switch(range){
+          case "1d":
+            endDate.setHours(16)
+            endDate.setMinutes(0)
+            endDate.setSeconds(0)
+            break;
+          case "1m":
+            endDate.setSeconds(0)
+            endDate.setMinutes(0)
+            endDate.setHours(16)
+            endDate.setMonth(endDate.getMonth() + 1)
+            endDate.setDate(-1) // the day before the first day of the next month because javascript is dumb
+            break;
+          case "1y":
+            endDate.setHours(16)
+            endDate.setMinutes(0)
+            endDate.setSeconds(0)
+            endDate.setFullYear(endDate.getFullYear() + 1)
+            endDate.setMonth(0)
+            endDate.setDate(-1)
+            break;
+
+        }
+
+        let rest = Math.round((endDate.getTime() - date[date.length - 1].getTime())/1000/60)
+        let begDate = date[date.length - 1]
+
+        for(let i = 0; i <= rest; i++){
+          date.push(new Date(begDate.getTime() + i * 60 * 1000))
+        }
+
+        return date;
+      }
       identikit.render_simple_chart = function(container, data){ // container : div object to house chart, data: formatted dateset (watchtower form)
           // default sizes to fit to div
           var newc = $(container);
@@ -21,19 +63,18 @@
 
           data = data.map(function(d) {
         			return {
-        				date: dP(d.timestamp),
-        				open: +d.indicators.open,
-        				high: +d.indicators.high,
-        				low: +d.indicators.low,
-        				close: +d.indicators.close,
-        				volume: +d.indicators.volume
+        				date: dP(d.timeStamp),
+        				open: +d.quote.open,
+        				high: +d.quote.high,
+        				low: +d.quote.low,
+        				close: +d.quote.close,
+        				volume: +d.quote.volume
         			};
             })
 
-            data = data.slice(data.length - 200, data.length)
-
+            data = data.slice(0, data.length - 150)
           // defaultidentikit margins
-          var margin = {top: 20, right: 0, bottom: 15, left: 0},
+          var margin = {top: 25, right: 0, bottom: 20, left: 0},
             width = sizes.width - margin.left - margin.right,
             height = sizes.height - margin.top - margin.bottom;
 
@@ -42,8 +83,7 @@
           var x = techan.scale.financetime().range([0, width]).outerPadding(0); // oh yea i forgot to mention we use techan as a dependency lmao
           var y = d3.scaleLinear().range([height, 0]);
 
-          var xAxis = d3.axisBottom(x).ticks(1).tickFormat(identikit.tickF).tickSizeOuter(0).tickSizeInner(0);
-          var yAxis = d3.axisLeft(y).ticks(0).tickSizeOuter(0).tickSizeInner(0); // probably remove this
+          var xAxis = d3.axisBottom(x).tickSizeOuter(0).tickSizeInner(0).ticks(20);//.tickFormat(identikit.monthTickF);
 
           var close = techan.plot.close()
             .xScale(x)
@@ -56,7 +96,7 @@
           	.append("g")
           	.attr("transform", "translate(" + margin.left + " ," + margin.top + " )");
 
-          x.domain(data.map(close.accessor().d));
+          x.domain(identikit.completeXDate("1d", data.map(function(d){return d.date})));
           y.domain(techan.scale.plot.ohlc(data, close.accessor()).domain());
 
           svg.append("path")
@@ -71,12 +111,6 @@
             .attr("transform", "translate(0," + height + ")")
             .attr("stroke-width", "2px");
 
-          svg.append("g")
-          	.attr("class", "y axis")
-          	.attr("stroke-width", "3px")
-          	.append("text")
-          	.attr("y", 6)
-          	.attr("dy", ".71em")
 
           var area = d3.area()
             .x(function(d) {
@@ -94,8 +128,6 @@
             .call(close);
           svg.selectAll("g.x.axis")
             .call(xAxis);
-          svg.selectAll("g.y.axis")
-            .call(yAxis);
           }
 
       return identikit;
