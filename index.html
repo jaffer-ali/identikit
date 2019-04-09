@@ -1,0 +1,19 @@
+<html>
+  <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/techan.js/0.8.0/techan.min.js"></script>
+  <script src="watchtower.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="stylesheet.css">.
+  <script src="identikit.js"></script>
+  <div id="meme" style="height:210px; width:400px; overflow: visible;">
+  </div>
+  <script>
+      watchtower.yahoo_finance.dateRange("AAPL", "5m", 1553175000, 1553198400).then(function(data){
+        console.log(data)
+
+        identikit.render_simple_chart("#meme", data.stockData);
+      });
+  </script>
+
+<html>

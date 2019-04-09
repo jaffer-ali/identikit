@@ -23,13 +23,11 @@
 			return (x_vals.filter(function(value, index, Arr) {
 				return index % step == 0;
 			}))
-			return retticks;
 		}
 		identikit.completeXDate = function(range, date) {
-			let endDate = new Date()
+			let endDate = new Date(date[0].getTime());
 			switch (range) {
 				case "1d":
-					endDate = date[0];
 					endDate.setHours(16)
 					endDate.setMinutes(0)
 					endDate.setSeconds(0)
@@ -49,14 +47,16 @@
 					endDate.setMonth(0)
 					endDate.setDate(-1)
 					break;
-
 			}
 
 			let rest = Math.round((endDate.getTime() - date[date.length - 1].getTime()) / 1000 / 60)
 			let begDate = date[date.length - 1]
 
+			console.log("beg " + begDate);
+			console.log("res" + rest);
+
 			for (let i = 0; i < rest; i++) {
-				date.push(new Date(begDate.getTime() + i * 60 * 1000))
+				//date.push(new Date(begDate.getTime() + i * 60 * 1000))
 			}
 
 			return date;
@@ -87,9 +87,9 @@
 			// defaultidentikit margins
 			var margin = {
 					top: 25,
-					right: 0,
+					right: 20,
 					bottom: 20,
-					left: 0
+					left: 20
 				},
 				width = sizes.width - margin.left - margin.right,
 				height = sizes.height - margin.top - margin.bottom;
@@ -100,7 +100,7 @@
 			var y = d3.scaleLinear().range([height, 0]);
 
       let n_ar = [];
-      for(let i = 0; i < 9; i++){
+      for(let i = 1; i < 8; i++){
 			//	console.log(identikit.dateWithTime(data[0].date, (8 + i)%12 + 1, 0, 0));
 				console.log(8 + i + 1);
         n_ar.push(identikit.dateWithTime(data[0].date, 9 + i, 0, 0));
@@ -115,8 +115,10 @@
           .tickSizeInner(0)
           .tickValues(n_ar)
           .tickFormat(function(e,q,s){
-						console.log(e);
-            return (e.getHours() + ":" + e.getMinutes())
+						let nums = e.toLocaleTimeString().replace(" ", ":").split(":");
+						let str = nums[0] + ":" + nums[1] + " " + nums[3];
+
+						return str;
           }); //.tickFormat(identikit.monthTickF);
 
 			var close = techan.plot.close()
@@ -136,6 +138,9 @@
 			})));
 			y.domain(techan.scale.plot.ohlc(data, close.accessor()).domain());
 
+
+			console.log(data[0].date);
+      console.log(n_ar);
 			svg.append("path")
 				.attr("class", "area")
 				.attr("fill-opacity", 0.025);
@@ -148,6 +153,10 @@
 				.attr("transform", "translate(0," + height + ")")
 				.attr("stroke-width", "2px");
 
+			svg.append("text") // ticker
+				.attr("class", "information-bar")
+				.attr("transform", "translateY(-" + margin.top + ")")
+				.text("hi" );
 
 			var area = d3.area()
 				.x(function(d) {
