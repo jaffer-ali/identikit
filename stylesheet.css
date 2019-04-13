@@ -22,6 +22,11 @@ g.area {
     fill: #00b35c;
     fill-opacity:.05;
 }
+.information-bar{
+  font-size: 18px;
+  font-weight:600;
+  fill: rgb(180,180,180);
+}
 .area{
     fill: #00b35c;
     fill-opacity:.05

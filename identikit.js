@@ -106,17 +106,13 @@
         n_ar.push(identikit.dateWithTime(data[0].date, 9 + i, 0, 0));
       }
 
-			console.log(data[0].date);
-      console.log(n_ar);
-
-
 			var xAxis = d3.axisBottom(x)
           .tickSizeOuter(0)
           .tickSizeInner(0)
           .tickValues(n_ar)
           .tickFormat(function(e,q,s){
-						let nums = e.toLocaleTimeString().replace(" ", ":").split(":");
-						let str = nums[0] + ":" + nums[1] + " " + nums[3];
+						let nums = e.toLocaleTimeString().split(":");
+						let str = nums[0] + ":" + nums[1];
 
 						return str;
           }); //.tickFormat(identikit.monthTickF);
@@ -153,10 +149,34 @@
 				.attr("transform", "translate(0," + height + ")")
 				.attr("stroke-width", "2px");
 
-			svg.append("text") // ticker
-				.attr("class", "information-bar")
-				.attr("transform", "translateY(-" + margin.top + ")")
-				.text("hi" );
+
+
+			let text = svg.append("div")// ticker
+					.attr("class", "info")
+					.attr("width", "100%")
+					.attr("height", margin.top);
+
+
+				text.append("svg:tspan") // TICKER
+					.attr("class", "information-bar")
+					.attr("margin-left", "20px")
+					.attr("width", "100%")
+					.text("AAPL");
+				text.append("svg:tspan") // PRICE CHANGE
+					.attr("class", "sub-info-bar")
+					.style("font-size", "12px")
+					.attr("x", width)
+					.style("font-weight", 600)
+					.style("text-anchor", "right")
+					.text("hi");
+				text.append("svg:tspan") // DATE
+					.attr("class", "sub-info-bar")
+					.style("font-size", "10px")
+					.style("text-anchor", "center")
+					.attr("x", width/2)
+					.style("font-weight", 500)
+					.text("hi");
+
 
 			var area = d3.area()
 				.x(function(d) {
