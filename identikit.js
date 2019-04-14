@@ -24,6 +24,20 @@
 				return index % step == 0;
 			}))
 		}
+		identikit.deltaPrice = function(box1, box2){
+			let dif = box2.high - box1.high;
+
+			let spl = dif.toString().split(".");
+			if(dif == 0){
+				return "0";
+			}
+			else if(dif > 0){
+				return  "+" + spl[0] + "." + spl[1].substring(0,2);
+			}
+			else if(dif < 0){
+				return spl[0] + "." + spl[1].substring(0,2);
+			}
+		}
 		identikit.completeXDate = function(range, date) {
 			let endDate = new Date(date[0].getTime());
 			switch (range) {
@@ -121,11 +135,20 @@
 				.xScale(x)
 				.yScale(y);
 
-			var svg = d3.select(container) // this probs isn't right
+			var svgcont = d3.select(container) // this probs isn't right
 				.append("svg")
 				.attr("width", width + margin.left + margin.right)
 				.attr("height", height + margin.top + margin.bottom)
-				.append("g")
+
+			let text = svgcont.append("g")// ticker
+				.attr("transform", "translate(" + margin.left + " ," + margin.top/2 + " )")
+				.attr("class", "info")
+				.attr("width", "100%")
+				.attr("height", "50px")
+				.style("width", "100%")
+				.style("height", margin.top + "px");
+
+			var svg = svgcont.append("g")
 				.attr("transform", "translate(" + margin.left + " ," + margin.top + " )");
 
 
@@ -151,31 +174,29 @@
 
 
 
-			let text = svg.append("div")// ticker
-					.attr("class", "info")
-					.attr("width", "100%")
-					.attr("height", margin.top);
 
 
-				text.append("svg:tspan") // TICKER
-					.attr("class", "information-bar")
-					.attr("margin-left", "20px")
-					.attr("width", "100%")
-					.text("AAPL");
-				text.append("svg:tspan") // PRICE CHANGE
-					.attr("class", "sub-info-bar")
-					.style("font-size", "12px")
-					.attr("x", width)
-					.style("font-weight", 600)
-					.style("text-anchor", "right")
-					.text("hi");
-				text.append("svg:tspan") // DATE
-					.attr("class", "sub-info-bar")
-					.style("font-size", "10px")
-					.style("text-anchor", "center")
-					.attr("x", width/2)
-					.style("font-weight", 500)
-					.text("hi");
+
+			text.append("text") // TICKER
+				.attr("class", "information-bar")
+				.attr("margin-left", "26px")
+				.attr("width", "100%")
+				.style("text-anchor", "start")
+				.text("AAPL");
+			text.append("text") // PRICE CHANGE
+				.attr("class", "sub-info-bar")
+				.style("font-size", "14px")
+				.attr("x", width)
+				.style("font-weight", 600)
+				.style("text-anchor", "end")
+				.text(identikit.deltaPrice(data[0], data[data.length - 1]));
+			text.append("text") // DATE
+				.attr("class", "sub-info-bar")
+				.style("font-size", "12px")
+				.attr("x", width/2)
+				.style("font-weight", 600)
+				.style("text-anchor", "middle")
+				.text("APR 10");
 
 
 			var area = d3.area()
