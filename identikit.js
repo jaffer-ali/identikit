@@ -241,6 +241,8 @@
 					focus.select("line.vertLine").style("visibility", "visible");
 					focus.select("circle.y").style("visibility", "visible");
 					focus.select("rect.traceInfo").style("visibility", "visible");
+					focus.select("text.info-text").style("visibility", "visible");
+
 				})
 				.on("mouseout", function() {
 					focus.select("circle.clicktrace").style("visibility", "hidden");
@@ -249,7 +251,7 @@
 					focus.select("line.traceLine").style("visibility", "hidden");
 					focus.select("rect.fill").style("visibility", "hidden");
 					focus.select("rect.traceInfo").style("visibility", "hidden");
-					focus.select("rect.traceInfo").attr("width", 60);
+					focus.select("text.info-text").style("visibility", "hidden");
 
 
 					currentDrop = null;
@@ -355,11 +357,16 @@
 					.attr("transform", "translate(" + x(d.date) + "," + y(d.close) + ")");
 
 				if(!currentDrop){
-					focus.select("rect.traceInfo") //trace
-						.attr("transform", "translate(" + (x(d.date) - 30) + ", -10)")
-					focus.select("text.info-text")
-						.attr("transform", "translate(" + (x(d.date))  + ", -2)")
-						.text(identikit.formatInfoText(d.open, "1d", d.date));
+						focus.select("text.info-text")
+							.attr("transform", "translate(" + x(d.date) + ", -2)")
+							.attr("text-anchor", "middle")
+							.text(identikit.formatInfoText(d.open, "1d", d.date));
+
+						let width = focus.select("text.info-text").node().getBBox().width + 5;
+						focus.select("rect.traceInfo")
+							.attr("width", width)
+							.attr("transform", "translate(" + (x(d.date) - width/2) + ", -10)");
+
 				} else{
 
 
