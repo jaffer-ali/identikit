@@ -25,7 +25,7 @@ g.area {
 .information-bar{
   font-size: 18px;
   font-weight:600;
-  fill: rgb(180,180,180);
+  fill: rgb(140,140,140);
 }
 .area{
     fill: #00b35c;
@@ -51,7 +51,7 @@ g.x.axis {
     stroke-width:1.86px;
     font-size:11px;
     font-family: 'Staatliches', cursive;
-    text-transfo2b1Ce9rm: uppercase;
+    text-transform: uppercase;
     color: blue;
 }
 path.domain{
