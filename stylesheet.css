@@ -2,12 +2,11 @@
     font-family: 'rubik-bold';
     src: url('/media/Rubik-Bold.ttf') format('truetype');
 }
-body {
-    font: 10px sans-serif;
-}
+
+
+
 text {
     fill: rgb(160,160,160);
-    ;
 }
 .ticker_text{
     color: rgb(90,90,90);

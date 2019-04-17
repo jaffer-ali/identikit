@@ -3,6 +3,7 @@
 
 	 function init() {
 		var identikit = {};
+
 		identikit.monthTickF = function(d, i) {
 			const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
 			if (d.getMonth() == 0) {
@@ -33,7 +34,7 @@
 						 }
 					 })() + " " + ampm;
 					break;
-				case "5d":
+				case "5d" || "1w5d":
 					return (date.getMonth() + 1) + "/" + (date.getDate()) + " " + identikit.dateFilter(date, "1d"); // you never saw it coming
 					break;
 				case "30d" || "60d":
@@ -49,7 +50,12 @@
 			}
 		}
 		identikit.formatInfoText = function(price, range, date1, date2){
+			console.log(price)
 			let splpr = price.toString().split(".")
+			if(typeof price === "undefined" || price == 0){ // i have reached peak laziness
+				splpr = "0.00".split(".");
+			}
+
 
 			let retText = "" + splpr[0] + "." + splpr[1].substring(0, 2);
 			if(typeof date2 !== "undefined"){
@@ -116,7 +122,7 @@
 					endDate.setHours(16)
 					endDate.setMonth(endDate.getMonth() + 1)
 					endDate.setDate(-1) // the day before the first day of the next month because javascript is dumb
-					break;
+					break;x
 				case "1y":
 					endDate.setHours(16)
 					endDate.setMinutes(0)
@@ -137,6 +143,8 @@
 
 			return date;
 		}
+
+
 		identikit.render_simple_chart = function(container, data) { // container : div object to house chart, data: formatted dateset (watchtower form)
 			// default sizes to fit to div
 			var newc = $(container);
@@ -144,12 +152,15 @@
 			var sizes = {
 				height: newc.height(),
 				width: newc.width()
-			};
+			};dispdate
 
 			var dP = d3.timeParse("%s");
 
+			var md = data.meta
+			var dispdate = new Date(md.timeRange.endDate * 1000)
 
-			data = data.map(function(d) {
+			console.log(identikit.dateFilter(dispdate, "5d"))
+			data = data.stockData.map(function(d) {
 				return {
 					date: dP(d.timeStamp),
 					open: +d.quote.open,
@@ -157,10 +168,10 @@
 					low: +d.quote.low,
 					close: +d.quote.close,
 					volume: +d.quote.volume
-				};
+				};0
 			})
 
-			// defaultidentikit margins
+			// defaultidentikit margins0
 			var margin = {
 					top: 40,
 					right: 20,
@@ -186,7 +197,7 @@
 				.tickValues(n_ar)
 				.tickFormat(function(e, q, s) {
 					let nums = e.toLocaleTimeString().split(":");
-					let str = nums[0] + ":" + nums[1];
+					let str = nums[0] + ":" + nums[1] + " " + nums[2].split(" ")[1];
 
 					return str;
 				}); //.tickFormat(identikit.monthTickF);
@@ -262,13 +273,12 @@
 
 
 			let c = identikit.deltaPrice(data[0], data[data.length - 1]);
-
 			text.append("text") // TICKER
 				.attr("class", "information-bar")
 				.attr("margin-left", "26px")
 				.attr("width", "100%")
 				.style("text-anchor", "start")
-				.text("AAPL");
+				.text(md.ticker); // C
 			text.append("text") // PRICE CHANGE
 				.attr("class", "sub-info-bar")
 				.style("font-size", "14px")
@@ -277,14 +287,14 @@
 				.style("text-anchor", "end")
 				.text(c.d)
 				.style("fill", c.c);
-			text.append("text") // DATE
+/*			text.append("text") // DATE // IMPLEMENT THIS LATER
 				.attr("class", "sub-info-bar")
 				.style("font-size", "10px")
 				.attr("x", width / 2)
 				.style("font-weight", 600)
 				.style("text-anchor", "middle")
-				.text("APR 10");
-
+				.text("APR 10"); // C
+*/
 			let bisectDate = d3.bisector(function(d) {
 				return d.date;
 			}).left;
@@ -305,13 +315,13 @@
 				.attr("ry", ".5px")
 				.style("stroke-width", 2)
 				.style("stroke", "rgb(235,235,235)");
+
 			focus.append("text") // INFO TEXT
 				.attr("class", "info-text")
 				.style("font-size", "8px")
 				.attr("x", 0)
 				.style("font-weight", 600)
-				.style("text-anchor", "middle")
-				.text("APR 10");
+				.style("text-anchor", "middle"); // C
 
 			focus.append("svg:line")
 				.attr("class", "vertLine")
@@ -366,18 +376,15 @@
 						focus.select("rect.traceInfo")
 							.attr("width", width)
 							.attr("transform", "translate(" + (x(d.date) - width/2) + ", -10)");
-
 				} else{
-
-
+					let pchange = d.open - currentDrop.open;
 					focus.select("text.info-text")
 						.attr("transform", "translate(" + (x(currentDrop.date) - ((x(currentDrop.date) - x(d.date))/2)) + ", -2)")
-						.text(identikit.formatInfoText(d.open, "1d", d.date, currentDrop.date));
+						.text(identikit.formatInfoText(pchange, "1d", d.date, currentDrop.date));
 					let width = focus.select("text.info-text").node().getBBox().width + 5 ;//Math.min(Math.max(Math.abs(x(currentDrop.date) - x(d.date)),60), 120);
 					focus.select("rect.traceInfo") //trace
 						.attr("transform", "translate(" + (x(currentDrop.date) - ((x(currentDrop.date) - x(d.date))/2) - width/2) + ", -10)")
 						.attr("width", width);
-
 				}
 
 				if(currentDrop){

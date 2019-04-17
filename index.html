@@ -10,9 +10,9 @@
   </div>
   <script>
       watchtower.yahoo_finance.dateRange("AAPL", "5m", 1553175000, 1553198400).then(function(data){
-        console.log(data)
+        console.log("RETDATA " + data)
 
-        identikit.render_simple_chart("#meme", data.stockData);
+        identikit.render_simple_chart("#meme", data);
       });
   </script>
 
