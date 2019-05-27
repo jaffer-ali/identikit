@@ -12,6 +12,15 @@
 				return months[d.getMonth()];
 			}
 		}
+		identikit.dateDisplay = function(date1, date2){
+			const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+			if(Math.abs(date1.getTime() - date2.getTime())/1000 < 86400){ // display x/x/xxxx 9:30 - 4:00
+				return months[date1.getMonth()] + " " +  (date1.getDate()) + "  9:30 AM - 4:00 PM"; // too lazy to actually do time
+			}
+			else{ // display
+				return (date1.getDate()) + "/" + (date1.getMonth()) + "/" + (date2.getFullYear()) + " - " + (date2.getDate()) + "/" + (date2.getMonth()) + "/" + (date2.getFullYear())
+			}
+		}
 		identikit.dateFilter = function(date, range){
 			switch(range){
 				case "1d": // return only time (6:32)
@@ -50,7 +59,6 @@
 			}
 		}
 		identikit.formatInfoText = function(price, range, date1, date2){
-			console.log(price)
 			let splpr = price.toString().split(".")
 			if(typeof price === "undefined" || price == 0){ // i have reached peak laziness
 				splpr = "0.00".split(".");
@@ -152,14 +160,12 @@
 			var sizes = {
 				height: newc.height(),
 				width: newc.width()
-			};dispdate
+			};
 
 			var dP = d3.timeParse("%s");
 
 			var md = data.meta
 			var dispdate = new Date(md.timeRange.endDate * 1000)
-
-			console.log(identikit.dateFilter(dispdate, "5d"))
 			data = data.stockData.map(function(d) {
 				return {
 					date: dP(d.timeStamp),
@@ -180,9 +186,6 @@
 				},
 				width = sizes.width - margin.left - margin.right,
 				height = sizes.height - margin.top - margin.bottom;
-
-
-
 			var x = techan.scale.financetime().range([0, width]); // oh yea i forgot to mention we use techan as a dependency lmao
 			var y = d3.scaleLinear().range([height, 0]);
 
@@ -206,10 +209,13 @@
 				.xScale(x)
 				.yScale(y);
 
-			var svgcont = d3.select(container) // this probs isn't right
+			var svgcont = d3.select(container)
 				.append("svg")
 				.attr("width", width + margin.left + margin.right)
 				.attr("height", height + margin.top + margin.bottom)
+				.style("fill", "rgb(160,160,160)")
+				.style("font-family", "rubik-bold")
+				.style("overflow", "visible")
 
 			let text = svgcont.append("g") // ticker
 				.attr("transform", "translate(" + margin.left + " ," + (margin.top / 2 + 5) + " )")
@@ -233,10 +239,14 @@
 
 			svg.append("path")
 				.attr("class", "area")
-				.attr("fill-opacity", 0.005);
+				.style("fill-opacity", 0.05)
+				.style("fill", "#00b35c");
 
 			svg.append("g")
-				.attr("class", "close");
+				.attr("class", "close")
+				.style("stroke", "#00b35c")
+				.style("fill-opacity", 0)
+				.style("stroke-width", "1.4px");
 
 			svg.append("g")
 				.attr("class", "x axis")
@@ -278,6 +288,10 @@
 				.attr("margin-left", "26px")
 				.attr("width", "100%")
 				.style("text-anchor", "start")
+				.style("font-size", "18px")
+				.style("font-weight", 600)
+				.style("font-family", "'rubik-bold', sans-serif")
+
 				.text(md.ticker); // C
 			text.append("text") // PRICE CHANGE
 				.attr("class", "sub-info-bar")
@@ -286,15 +300,20 @@
 				.style("font-weight", 600)
 				.style("text-anchor", "end")
 				.text(c.d)
+				.style("font-family", "'rubik-bold', sans-serif")
+
 				.style("fill", c.c);
-/*			text.append("text") // DATE // IMPLEMENT THIS LATER
+
+
+			text.append("text") // DATE // IMPLEMENT THIS LATER
 				.attr("class", "sub-info-bar")
 				.style("font-size", "10px")
 				.attr("x", width / 2)
 				.style("font-weight", 600)
 				.style("text-anchor", "middle")
-				.text("APR 10"); // C
-*/
+				.style("font-family", "'rubik-bold', sans-serif")
+				.text(identikit.dateDisplay(new Date(md.timeRange.startDate * 1000), new Date(md.timeRange.endDate * 1000))); // C
+
 			let bisectDate = d3.bisector(function(d) {
 				return d.date;
 			}).left;
@@ -321,6 +340,8 @@
 				.style("font-size", "8px")
 				.attr("x", 0)
 				.style("font-weight", 600)
+				.style("font-family", "'rubik-bold', sans-serif")
+
 				.style("text-anchor", "middle"); // C
 
 			focus.append("svg:line")
@@ -449,7 +470,7 @@
 				})
 				.y0(height + 1)
 				.y1(function(d) {
-					return y(d.close);
+					return y(d.open);
 				});
 
 			svg.selectAll("path.area")
@@ -459,7 +480,13 @@
 				.datum(data)
 				.call(close);
 			svg.selectAll("g.x.axis")
-				.call(xAxis);
+				.style("font-weight", "bold")
+				.style("font-size", "11px")
+				.style("fill", "rgb(160,160,160)")
+				.call(xAxis)
+				.select(".domain")
+					.style("stroke", "rgb(170,170,170)");
+			svg.selectAll(".tick").select("text").style("fill", "rgb(160,160,160)");
 		}
 
 		return identikit;
